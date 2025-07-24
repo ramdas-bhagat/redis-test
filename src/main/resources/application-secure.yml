@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: redis-test
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      enable-statistics: true
+      key-prefix: "redis-test:"
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:devpassword123}
+      timeout: 2000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: 1000
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ${H2_PASSWORD:} # Use environment variable in production
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+  h2:
+    console:
+      enabled: ${H2_CONSOLE_ENABLED:false} # Disabled by default
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: ${JPA_SHOW_SQL:false} # Disabled by default for security
+
+server:
+  port: ${SERVER_PORT:7070}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info # Limit exposed actuator endpoints
+  endpoint:
+    health:
+      show-details: when-authorized # Hide details from unauthorized users
+
+logging:
+  level:
+    '[com.skyeagle.redis_test]': ${LOG_LEVEL:INFO}
+    '[org.springframework.security]': WARN # Reduce security logging
+    '[org.hibernate.SQL]': WARN # Hide SQL in production

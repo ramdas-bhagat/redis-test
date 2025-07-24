@@ -64,3 +64,10 @@ replay_pid*
 # Additional exclusions
 logs/
 dump.rdb
+
+# Security - NEVER commit these files
+.env
+*.key
+*.pem
+secrets/
+credentials/

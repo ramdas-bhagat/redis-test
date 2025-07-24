@@ -29,10 +29,10 @@ spring:
       idle-timeout: 300000 # 5 minutes
   h2:
     console:
-      enabled: true
+      enabled: true # Only for development - disable in production
       path: /h2-console
       settings:
-        web-allow-others: true # Allow access from Docker network
+        web-allow-others: false # Security: Only allow localhost access
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
