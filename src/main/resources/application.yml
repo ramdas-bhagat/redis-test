@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: redis-test
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000 # Cache TTL: 1 hour
+      enable-statistics: true # Enable cache statistics
+      key-prefix: "redis-test:" # Prefix for cache keys
+  data:
+    redis:
+      host: localhost # Default for local development
+      port: 6379
+      timeout: 2000 # Connection timeout in milliseconds
+      lettuce: # Using Lettuce client
+        pool:
+          max-active: 8 # Max number of connections
+          max-idle: 8 # Max number of idle connections
+          min-idle: 2 # Min number of idle connections
+          max-wait: 1000 # Max wait time for connection
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari: # HikariCP connection pool settings
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000 # 5 minutes
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true # Allow access from Docker network
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        "[format_sql]": true
+        # "[generate_statistics]": true # Enable hibernate statistics
+        "[order_updates]": true # Batch updates optimization
+        jdbc:
+          "[batch_size]": 50 # Batch size for operations
+  sql:
+    init:
+      mode: always
+
+server:
+  port: 7070
+
+management: # Actuator endpoints for monitoring
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,caches
+  endpoint:
+    health:
+      show-details: always

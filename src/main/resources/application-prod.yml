@@ -1,0 +1,26 @@
+spring:
+  data:
+    redis:
+      host: redis # Docker service name for production
+  h2:
+    console:
+      settings:
+        web-allow-others: true # Allow access from Docker network in prod
+
+# Production-specific logging
+logging:
+  level:
+    root: INFO
+    "[com.skyeagle.redis_test]": INFO
+    "[org.hibernate.SQL]": WARN
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": WARN
+
+# Disable detailed actuator info in prod
+management:
+  endpoint:
+    health:
+      show-details: never
+  endpoints:
+    web:
+      exposure:
+        include: health,info

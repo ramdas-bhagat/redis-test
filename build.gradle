@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.diffplug.spotless' version '6.23.3'
+}
+
+group = 'com.skyeagle'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+	implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+
+tasks.register('clearLogs', Delete) {
+  dependsOn(tasks.named('clean'))
+  delete file('logs')
+}
+
+tasks.register('copyLatestJar', Copy) {
+    dependsOn 'build'  // Ensure the build task runs first
+
+    from("${buildDir}/libs")
+    into("${buildDir}/libs/latest")
+    include('*.jar')
+    exclude('*-plain.jar')
+
+	doLast {
+        println("Build and copy of jar is done.")
+    }
+}
+
+tasks.register('buildAndCopy') {
+    dependsOn 'build', 'copyLatestJar'
+    doLast {
+        println 'Build and copy completed!'
+    }
+}
+
+spotless {
+    java {
+        // Use Google's java formatter with specific version and style
+        googleJavaFormat('1.17.0').aosp()  // AOSP style is more lenient with line breaks
+
+        // Remove unused imports
+        removeUnusedImports()
+
+        // Sort imports
+        importOrder('java', 'javax', 'org', 'com', '')
+
+        // Apply formatting to these files
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+    }
+}
