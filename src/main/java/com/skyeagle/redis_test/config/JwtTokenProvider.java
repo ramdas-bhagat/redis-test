@@ -21,9 +21,10 @@ public class JwtTokenProvider {
     private Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     // Use environment variable for production security
-    private final String jwtSecret = System.getenv("JWT_SECRET_KEY") != null
-        ? System.getenv("JWT_SECRET_KEY")
-        : generateKey(); // Fallback for development only
+    private final String jwtSecret =
+            System.getenv("JWT_SECRET_KEY") != null
+                    ? System.getenv("JWT_SECRET_KEY")
+                    : generateKey(); // Fallback for development only
     private long jwtExpirationDate = 3600000; // 1h = 3600s and 3600*1000 = 3600000 milliseconds
 
     public String generateToken(Authentication authentication) {
@@ -99,7 +100,8 @@ public class JwtTokenProvider {
     public String generateKey() {
         Key key = Jwts.SIG.HS256.key().build();
         String encodedKey = Base64.getEncoder().encodeToString(key.getEncoded());
-        logger.warn("DEVELOPMENT: Using auto-generated JWT key. Set JWT_SECRET_KEY environment variable for production!");
+        logger.warn(
+                "DEVELOPMENT: Using auto-generated JWT key. Set JWT_SECRET_KEY environment variable for production!");
         return encodedKey;
     }
 

@@ -26,10 +26,35 @@ services:
     ports:
       - "127.0.0.1:8081:8081" # Bind to localhost only
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: redis-test-app-secure
+    ports:
+      - "127.0.0.1:7070:7070" # Bind to localhost only for security
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=secure
+      - REDIS_HOST=redis # Override for Docker network
+      - JAVA_OPTS=-Xms512m -Xmx512m -XX:+UseG1GC
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:7070/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
